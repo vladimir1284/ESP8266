@@ -1,0 +1,16 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/home/vladimir/.arduino15/packages/esp8266/tools/**",
+                "/home/vladimir/.arduino15/packages/esp8266/hardware/esp8266/2.3.0/**"
+            ],
+            "forcedInclude": [],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}

@@ -1,0 +1,247 @@
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="w3.css">
+    <style>
+        body,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: "Poppins", sans-serif
+        }
+
+        body {
+            font-size: 16px;
+        }
+
+        .w3-half img {
+            margin-bottom: -6px;
+            margin-top: 16px;
+            opacity: 0.8;
+            cursor: pointer
+        }
+
+        .w3-half img:hover {
+            opacity: 1
+        }
+
+        .floatMenu {
+            left: 25%;
+            top: 15%;
+            position: absolute
+        }
+    </style>
+    <title>
+        Test tank indicator
+    </title>
+    <script src="indicators.js"></script>
+    </script>
+</head>
+
+<body onLoad="initPage()">
+    <!-- Sidebar/menu -->
+    <nav class="w3-sidebar w3-teal w3-collapse w3-top w3-large w3-padding"
+        style="z-index:3;width:200px;font-weight:bold;" id="mySidebar"><br>
+        <a href="javascript:void(0)" onclick="w3_close()" class="w3-button w3-hide-large w3-display-topleft"
+            style="width:100%;font-size:22px">Cerrar Menú</a>
+        <div class="w3-container">
+            <h3 class="w3-padding-64"><b>PuntoINO</b></h3>
+        </div>
+        <div class="w3-bar-block">
+            <a href="#" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">General</a>
+            <a href="#showcase" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Taller</a>
+            <a href="webrepl.html" target="_blank" onclick="startWebrepl('on')"
+                class="w3-bar-item w3-button w3-hover-white">webrepl</a>
+        </div>
+    </nav>
+
+    <!-- Top menu on small screens -->
+    <header class="w3-container w3-top w3-hide-large w3-teal w3-xlarge w3-padding">
+        <a href="javascript:void(0)" class="w3-button w3-teal w3-margin-right" onclick="w3_open()">☰</a>
+        <span>PuntoINO</span>
+    </header>
+
+    <!-- Overlay effect when opening sidebar on small screens -->
+    <div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu"
+        id="myOverlay"></div>
+
+    <!-- !PAGE CONTENT! -->
+    <div class="w3-main" style="margin-left:240px;margin-right:40px">
+        <!-- Header -->
+        <div class="w3-container" style="margin-top:80px" id="showcase">
+            <h1 class="w3-xxlarge"><b>Casa Inteligente</b></h1>
+            <h1 class="w3-xlarge w3-text-teal"><b>Taller.</b></h1>
+            <hr style="width:50px;border:5px solid teal" class="w3-round">
+        </div>
+        <div class="w3-container" id="msgBar">
+        </div>
+        <!-- Menu for Upper Tank -->
+        <div class="w3-overlay w3-centered " style="display:none" id="menu_upperTank">
+            <form class="w3-teal w3-bar-block floatMenu">
+                <div class="w3-center w3-text-black w3-container w3-white">
+                    Tanque Elevado
+                </div>
+                <div onclick="configure_upperTank()" class="w3-bar-item w3-button w3-hover-white">Configurar</div>
+                <div onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Cerrar</div>
+            </form>
+        </div>
+        <!-- Menu for Lower Tank -->
+        <div class="w3-overlay w3-centered " style="display:none" id="menu_lowerTank">
+            <form class="w3-teal w3-bar-block floatMenu">
+                <div class="w3-center w3-text-black w3-container w3-white">
+                    Cisterna
+                </div>
+                <div onclick="configure_lowerTank()" class="w3-bar-item w3-button w3-hover-white">Configurar</div>
+                <div onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Cerrar</div>
+            </form>
+        </div>
+        <!-- Menu for the Pump -->
+        <div class="w3-overlay w3-centered " style="display:none" id="menu_pump">
+            <form class="w3-teal w3-bar-block floatMenu">
+                <div class="w3-center w3-text-black w3-container w3-white">
+                    Bomba
+                </div>
+                <div onclick="startPump()" class="w3-bar-item w3-button w3-hover-white">Llenar</div>
+                <div onclick="stopPump()" class="w3-bar-item w3-button w3-hover-white">Detener</div>
+                <div onclick="ackPump()" class="w3-bar-item w3-button w3-hover-white">Rearmar</div>
+                <div onclick="configure_pump()" class="w3-bar-item w3-button w3-hover-white">Configurar</div>
+                <div onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Cerrar</div>
+            </form>
+        </div>
+
+        <!-- Configuration form for Tanks -->
+        <div class="w3-overlay w3-centered " style="display:none" id="tank_config">
+            <form class="w3-teal w3-bar-block floatMenu">
+                <div id="config_tank_label" class="w3-center w3-text-black w3-container w3-white">
+                </div>
+                <div class="w3-bar-block">
+                    <label class="w3-bar-item">Capacidad</label>
+                    <input class="w3-input w3-border" onfocusout="setTankCapacity()" type="text" name="Capacity"
+                        id="inputCapacity">
+                </div>
+                <div class="w3-bar-block">
+                    <label class="w3-bar-item">Altura</label>
+                    <input class="w3-input w3-border" onfocusout="setTankHeight()" type="text" name="Altura"
+                        id="inputHeight">
+                </div>
+                <div class="w3-bar-block">
+                    <label class="w3-bar-item">Brecha Superior</label>
+                    <input class="w3-input w3-border" onfocusout="setTankGap()" type="text" name="gap" id="inputGap">
+                </div>
+                <div class="w3-bar-block">
+                    <div class="w3-bar-item" id="labelRestart"></div>
+                    <div class="slidecontainer w3-margin-left w3-margin-right">
+                        <input onInput="setTankRestart()" type="range" min="10" max="100" value="50" class="slider"
+                            id="slideRestart">
+                    </div>
+                </div>
+                <div class="w3-bar-block">
+                    <div class="w3-bar-item" id="labelMin"></div>
+                    <div class="slidecontainer w3-margin-left w3-margin-right">
+                        <input onInput="setTankMin()" type="range" min="10" max="100" value="50" class="slider"
+                            id="slideMin">
+                    </div>
+                </div>
+                <div onclick="saveTankConfigs()" class="w3-bar-item w3-button w3-hover-white">Guardar</div>
+                <div onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Cerrar</div>
+            </form>
+        </div>
+
+        <!-- Configuration form for the Pump -->
+        <div class="w3-overlay w3-centered " style="display:none" id="pump_config">
+            <form class="w3-teal w3-bar-block floatMenu">
+                <div id="config_pump_label" class="w3-center w3-text-black w3-container w3-white">
+                </div>
+                <div class="w3-bar-block">
+                    <label class="w3-bar-item">Tiempo máximo de encendido</label>
+                    <input class="w3-input w3-border" onfocusout="setPumpTmax()" type="text" name="Tmax" id="inputTmax">
+                </div>
+                <div class="w3-bar-block">
+                    <div class="w3-bar-item" id="labelStart"></div>
+                    <div class="slidecontainer w3-margin-left w3-margin-right">
+                        <input onInput="setPumpStart()" type="range" min="1" max="10" value="3" class="slider"
+                            id="slideStart">
+                    </div>
+                </div>
+                <div onclick="savePumpConfigs()" class="w3-bar-item w3-button w3-hover-white">Guardar</div>
+                <div onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Cerrar</div>
+            </form>
+        </div>
+
+
+        <!-- Indicators -->
+        <div class="w3-row-padding w3-grayscale">
+            <div class="w3-col m4 w3-margin-bottom" onclick="menu_upperTank()">
+                <div class="w3-light-grey">
+                    <div class="w3-container">
+                        <div class="w3-center">
+                            Tanque Elevado
+                        </div>
+                        <div id="upper_volume" class="w3-center">
+                            0 lts
+                        </div>
+                        <canvas id="upper_tank" class="w3-col"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="w3-col m4 w3-margin-bottom" onclick="menu_lowerTank()">
+                <div class=" w3-light-grey">
+                    <div class="w3-container">
+                        <div class="w3-center">
+                            Cisterna
+                        </div>
+                        <div id="lower_volume" class="w3-center	">
+                            0 lts
+                        </div>
+                        <canvas id="lower_tank" class="w3-col"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="w3-col m4 w3-margin-bottom" onclick="menu_pump()">
+                <div class="w3-light-grey">
+                    <div class="w3-container">
+                        <div class="w3-center">
+                            Bomba
+                        </div>
+                        <div id="pump_state" class="w3-center	">
+                            Apagada
+                        </div>
+                        <canvas id="pump" class="w3-col"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="w3-col m4 w3-margin-bottom"">
+                <div class="w3-light-grey">
+                    <div class="w3-container">
+                        <div class="w3-center">
+                            Sensor de movimiento
+                        </div>
+                        <div id="movement_state" class="w3-center	">
+                            Apagado
+                        </div>
+                        <canvas id="movement" class="w3-col"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="w3-col m4 w3-margin-bottom"">
+                <div class="w3-light-grey">
+                    <div class="w3-container">
+                        <div class="w3-center">
+                            Luz del Taller
+                        </div>
+                        <div id="light_state" class="w3-center	">
+                            Apagada
+                        </div>
+                        <canvas id="light" class="w3-col"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
