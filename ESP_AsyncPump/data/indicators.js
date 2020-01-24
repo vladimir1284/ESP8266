@@ -1,9 +1,9 @@
 function ge(s) { return document.getElementById(s); }
 
 uTank = {
-    min_level: 0,
+    min_level: 40,
     canvasID: 'upper_tank',
-    capacity: 0,
+    capacity: 550,
     labelID: "upper_volume",
     label: "Tanque Elevado",
     yc: 0,
@@ -16,9 +16,9 @@ uTank = {
     gap: 0,
 }
 lTank = {
-    min_level: 0,
+    min_level: 25,
     canvasID: 'lower_tank',
-    capacity: 0,
+    capacity: 200,
     labelID: "lower_volume",
     label: "Cisterna",
     yc: 0,
@@ -52,11 +52,23 @@ mvSensor = {
     xc: 0,
     h: 0,
     w: 0,
+    has_luminosity: true,
+    luminosity: 30
 }
 myLight = {
     state: 0,
     canvasID: 'light',
     labelID: 'light_state',
+    ctx: null,
+    yc: 0,
+    xc: 0,
+    h: 0,
+    w: 0,
+}
+myDoor = {
+    state: 0,
+    canvasID: 'door',
+    labelID: 'door_state',
     ctx: null,
     yc: 0,
     xc: 0,
@@ -201,7 +213,9 @@ function updateLightValue(value, light) {
     ctx = light.ctx
     xc = light.xc
     yc = light.yc
-    if (value != 0) {
+    if (value) {
+        light.state = 1
+        ge(light.labelID).innerHTML = "Encendida"
         ctx.fillStyle = "#fafd08"
         ctx.beginPath()
         ctx.translate(xc, yc - 5 * pxl)
@@ -218,7 +232,9 @@ function updateLightValue(value, light) {
         ctx.rotate(5 * Math.PI / 4)
         ctx.translate(-xc, -yc + 5 * pxl)
     } else {
-        ctx.clearRect(0, 0, 2*xc, 2*yc)
+        light.state = 0
+        ge(light.labelID).innerHTML = "Apagada"
+        ctx.clearRect(0, 0, 2 * xc, 2 * yc)
         drawLightTemplate(light)
     }
 
@@ -261,6 +277,107 @@ function drawLightTemplate(light) {
     }
 }
 
+function drawDoorTemplate(door) {
+    let canvas = ge(door.canvasID);
+    if (canvas.getContext) {
+        const xc = 0.5 * canvas.width;
+        const yc = 0.5 * canvas.height;
+        let w = 0.8 * canvas.width;
+        let h = w;
+        if (h > (0.8 * canvas.height)) {
+            h = 0.8 * canvas.height;
+            w = h;
+        }
+        door.h = h;
+        door.w = w;
+        door.xc = xc;
+        door.yc = yc;
+        const pxl = w / 100;
+
+        let ctx = canvas.getContext('2d');
+        door.ctx = ctx
+        ctx.lineWidth = 2
+        ctx.translate(xc / 2, yc / 4)
+        if (door.state) {
+            ctx.beginPath()
+            ctx.moveTo(78 * pxl, 86 * pxl)
+            ctx.lineTo(87 * pxl, 86 * pxl)
+            ctx.lineTo(87 * pxl, 11 * pxl)
+            ctx.lineTo(64 * pxl, 11 * pxl)
+            ctx.lineTo(78 * pxl, 18 * pxl)
+            ctx.lineTo(78 * pxl, 86 * pxl)
+            ctx.lineTo(49 * pxl, 95 * pxl)
+            ctx.lineTo(49 * pxl, 5 * pxl)
+            ctx.lineTo(64 * pxl, 11 * pxl)
+            ctx.moveTo(49 * pxl, 18 * pxl)
+            ctx.lineTo(42 * pxl, 18 * pxl)
+            ctx.lineTo(42 * pxl, 86 * pxl)
+            ctx.lineTo(34 * pxl, 86 * pxl)
+            ctx.lineTo(34 * pxl, 40 * pxl)
+            ctx.moveTo(34 * pxl, 26 * pxl)
+            ctx.lineTo(34 * pxl, 11 * pxl)
+            ctx.lineTo(49 * pxl, 11 * pxl)
+
+            ctx.moveTo(56 * pxl, 47 * pxl)
+            ctx.lineTo(56 * pxl, 61 * pxl)
+        } else {
+            ctx.strokeRect(34 * pxl, 11 * pxl, 53 * pxl, 75 * pxl)
+            ctx.strokeRect(42 * pxl, 18 * pxl, 36 * pxl, 68 * pxl)
+            ctx.clearRect(30 * pxl, 25 * pxl, 5 * pxl, 13 * pxl)
+            ctx.moveTo(49 * pxl, 47 * pxl)
+            ctx.lineTo(49 * pxl, 57 * pxl)
+        }
+        ctx.moveTo(37 * pxl, 29 * pxl)
+        ctx.lineTo(37 * pxl, 36 * pxl)
+        ctx.moveTo(31 * pxl, 29 * pxl)
+        ctx.lineTo(31 * pxl, 36 * pxl)
+        ctx.stroke()
+        ctx.beginPath()
+        ctx.arc(34 * pxl, 29 * pxl, 3 * pxl, Math.PI, 2 * Math.PI)
+        ctx.arc(34 * pxl, 36 * pxl, 3 * pxl, 0, Math.PI)
+        ctx.stroke()
+        ctx.beginPath()
+        ctx.moveTo(25 * pxl, 49 * pxl)
+        ctx.lineTo(18 * pxl, 56 * pxl)
+        ctx.moveTo(23 * pxl, 33 * pxl)
+        ctx.lineTo(13 * pxl, 33 * pxl)
+        ctx.moveTo(25 * pxl, 17 * pxl)
+        ctx.lineTo(19 * pxl, 10 * pxl)
+        ctx.stroke()
+
+        ctx.translate(-xc / 2, -yc / 4)
+    }
+}
+
+function updateDoorValue(value, door) {
+    if (value != door.state) {
+        door.state = value
+        ctx = door.ctx
+        w = door.w
+        xc = door.xc
+        yc = door.yc
+        pxl = w / 100
+        ctx.clearRect(xc / 3, yc / 5, 150 * pxl, 110 * pxl)
+        switch (value) {
+            case 0:
+                ge(door.labelID).innerHTML = "Cerrada"
+                drawDoorTemplate(door)
+                break
+            case 1:
+                ge(door.labelID).innerHTML = "Abierta"
+                drawDoorTemplate(door)
+                break
+            default:
+                ge(door.labelID).innerHTML = "Error"
+                drawDoorTemplate(door)
+                ctx.strokeStyle = "#ff0000"
+                ctx.strokeRect(xc / 2, yc / 4, xc, 1.6 * yc)
+                ctx.strokeStyle = "#000000"
+                break
+        }
+    }
+}
+
 function drawMovementTemplate(mv) {
     let canvas = ge(mv.canvasID);
     if (canvas.getContext) {
@@ -280,7 +397,28 @@ function drawMovementTemplate(mv) {
 
         let ctx = canvas.getContext('2d');
         mv.ctx = ctx
+        // Luminosity sensor
+        if (mv.has_luminosity) {
+            ctx.beginPath()
+            ctx.lineWidth = 4
+            ctx.arc(90 * pxl, 20 * pxl, 6 * pxl, 0, 2 * Math.PI)
+            ctx.stroke()
 
+            ctx.beginPath()
+            ctx.translate(90 * pxl, 20 * pxl)
+            for (i = 0; i < 8; i++) {
+                ctx.fillRect(8 * pxl, -pxl, 4 * pxl, 2 * pxl)
+                ctx.rotate(Math.PI / 4)
+            }
+            ctx.translate(-90 * pxl, -20 * pxl)
+
+            // indicator bar
+            updateLuminosityValue(mv.luminosity, mv)
+        } else {
+            ctx.translate(2 * w / 3, 0);
+        }
+
+        // Movement Sensor
         ctx.beginPath();
         ctx.moveTo(30 * pxl, 50 * pxl);
         ctx.lineTo(30 * pxl, 42 * pxl);
@@ -313,7 +451,6 @@ function drawMovementTemplate(mv) {
         ctx.closePath()
         ctx.fill()
 
-        // Luminosity sensor
         ctx.beginPath();
         ctx.arc(18 * pxl, 11 * pxl, 3 * pxl, 0, Math.PI)
         ctx.fill()
@@ -325,21 +462,9 @@ function drawMovementTemplate(mv) {
             ctx.stroke()
         }
 
-        ctx.beginPath()
-        ctx.lineWidth = 4
-        ctx.arc(90 * pxl, 20 * pxl, 6 * pxl, 0, 2 * Math.PI)
-        ctx.stroke()
-
-        ctx.beginPath()
-        ctx.translate(90 * pxl, 20 * pxl)
-        for (i = 0; i < 8; i++) {
-            ctx.fillRect(8 * pxl, -pxl, 4 * pxl, 2 * pxl)
-            ctx.rotate(Math.PI / 4)
+        if (!mv.has_luminosity) {
+            ctx.translate(-2 * w / 3, 0);
         }
-        ctx.translate(-90 * pxl, -20 * pxl)
-
-        // indicator bar
-        updateLuminosityValue(0, mv)
     }
 }
 
@@ -350,9 +475,11 @@ function updateLuminosityValue(value, mv) {
     if (value > 100) {
         value = 100
     }
+    mv.luminosity = value
     value = Math.round(value / 10)
     ctx = mv.ctx
-    pxl = mv.w / 48
+    w = mv.w
+    pxl = w / 48
     ctx.beginPath()
     ctx.translate(71 * pxl, 45 * pxl)
     ctx.clearRect(-pxl, -pxl, 45 * pxl, 5 * pxl)
@@ -366,6 +493,31 @@ function updateLuminosityValue(value, mv) {
     }
     ctx.fillStyle = "#000000"
     ctx.translate(-71 * pxl, -45 * pxl)
+}
+
+function updateMovementValue(value, mv) {
+    ctx = mv.ctx
+    w = mv.w
+    pxl = w / 48
+    if (!mv.has_luminosity) {
+        ctx.translate(2 * w / 3, 0);
+    }
+    if (value) {
+        ctx.strokeStyle = "#ff0000"
+        ctx.strokeRect(10 * pxl, 5 * pxl, 45 * pxl, 50 * pxl)
+        ctx.strokeStyle = "#000000"
+        if (!mv.has_luminosity) {
+            ctx.translate(-2 * w / 3, 0);
+        }
+    }
+    else {
+        ctx.clearRect(9 * pxl, 4 * pxl, 47 * pxl, 52 * pxl)
+        if (!mv.has_luminosity) {
+            ctx.translate(-2 * w / 3, 0);
+        }
+        drawMovementTemplate(mv)
+
+    }
 }
 
 function drawLowerTankTemplate(tank) {
@@ -544,10 +696,6 @@ function updateValues() {
     setTimeout(updateValues, 2000)
 }
 
-function startWebrepl(state) {
-    fetch("/webrepl?state=" + state)
-}
-
 
 function resetIndicators() {
     updateTankValue(0, uTank)
@@ -557,6 +705,7 @@ function resetIndicators() {
     drawPumpTemplate(myPump)
     drawMovementTemplate(mvSensor)
     drawLightTemplate(myLight)
+    drawDoorTemplate(myDoor)
     animatePump()
 }
 // Script to open and close sidebar

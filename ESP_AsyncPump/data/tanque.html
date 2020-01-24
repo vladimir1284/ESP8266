@@ -18,17 +18,6 @@
             font-size: 16px;
         }
 
-        .w3-half img {
-            margin-bottom: -6px;
-            margin-top: 16px;
-            opacity: 0.8;
-            cursor: pointer
-        }
-
-        .w3-half img:hover {
-            opacity: 1
-        }
-
         .floatMenu {
             left: 25%;
             top: 15%;
@@ -36,7 +25,7 @@
         }
     </style>
     <title>
-        Test tank indicator
+        Casa Inteligente
     </title>
     <script src="indicators.js"></script>
     </script>
@@ -49,13 +38,13 @@
         <a href="javascript:void(0)" onclick="w3_close()" class="w3-button w3-hide-large w3-display-topleft"
             style="width:100%;font-size:22px">Cerrar Menú</a>
         <div class="w3-container">
-            <h3 class="w3-padding-64"><b>PuntoINO</b></h3>
+            <img src="logo_web.png" style="margin: 1em"></img>
         </div>
         <div class="w3-bar-block">
             <a href="#" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">General</a>
             <a href="#showcase" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Taller</a>
-            <a href="webrepl.html" target="_blank" onclick="startWebrepl('on')"
-                class="w3-bar-item w3-button w3-hover-white">webrepl</a>
+            <a href="upload.html" target="_blank""
+                class=" w3-bar-item w3-button w3-hover-white">Configurar</a>
         </div>
     </nav>
 
@@ -72,12 +61,10 @@
     <!-- !PAGE CONTENT! -->
     <div class="w3-main" style="margin-left:240px;margin-right:40px">
         <!-- Header -->
-        <div class="w3-container" style="margin-top:80px" id="showcase">
-            <h1 class="w3-xxlarge"><b>Casa Inteligente</b></h1>
-            <h1 class="w3-xlarge w3-text-teal"><b>Taller.</b></h1>
-            <hr style="width:50px;border:5px solid teal" class="w3-round">
-        </div>
-        <div class="w3-container" id="msgBar">
+        <div class="w3-container" style="margin-top:60px" id="showcase">
+            <!-- <h1 class="w3-xxlarge"><b>Casa Inteligente</b></h1> -->
+            <h1 class="w3-xxlarge w3-text-teal"><b>Taller</b></h1>
+            <hr style="width:50%;margin-block-start:0;border:3px solid teal" class="w3-round">
         </div>
         <!-- Menu for Upper Tank -->
         <div class="w3-overlay w3-centered " style="display:none" id="menu_upperTank">
@@ -215,31 +202,45 @@
                 </div>
             </div>
             <div class="w3-col m4 w3-margin-bottom"">
-                <div class="w3-light-grey">
-                    <div class="w3-container">
-                        <div class="w3-center">
-                            Sensor de movimiento
-                        </div>
-                        <div id="movement_state" class="w3-center	">
-                            Apagado
-                        </div>
-                        <canvas id="movement" class="w3-col"></canvas>
+                <div class=" w3-light-grey">
+                <div class="w3-container">
+                    <div class="w3-center">
+                        Sensor
                     </div>
+                    <div id="movement_state" class="w3-center	">
+                        Movimiento
+                    </div>
+                    <canvas id="movement" class="w3-col"></canvas>
                 </div>
             </div>
-            <div class="w3-col m4 w3-margin-bottom"">
-                <div class="w3-light-grey">
-                    <div class="w3-container">
-                        <div class="w3-center">
-                            Luz del Taller
-                        </div>
-                        <div id="light_state" class="w3-center	">
-                            Apagada
-                        </div>
-                        <canvas id="light" class="w3-col"></canvas>
+        </div>
+        <div class="w3-col m4 w3-margin-bottom">
+            <div class=" w3-light-grey">
+                <div class="w3-container">
+                    <div class="w3-center">
+                        Luz del Taller
                     </div>
+                    <div id="light_state" class="w3-center	">
+                        Apagada
+                    </div>
+                    <canvas id="light" class="w3-col"></canvas>
                 </div>
             </div>
+        </div>
+        <div class="w3-col m4 w3-margin-bottom">
+            <div class=" w3-light-grey">
+                <div class="w3-container">
+                    <div class="w3-center">
+                        Puerta
+                    </div>
+                    <div id="door_state" class="w3-center	">
+                        Cerrada
+                    </div>
+                    <canvas id="door" class="w3-col"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="w3-container" id="msgBar">
         </div>
     </div>
 </body>
