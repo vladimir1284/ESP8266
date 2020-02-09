@@ -1,0 +1,76 @@
+
+uTank = {
+    min_level: 40,
+    canvasID: 'upper_tank',
+    capacity: 550,
+    labelID: "upper_volume",
+    label: "Tanque Elevado",
+    yc: 0,
+    xc: 0,
+    h: 0,
+    w: 0,
+    min: 0,
+    restart: 0,
+    height: 0,
+    gap: 0,
+}
+lTank = {
+    min_level: 25,
+    canvasID: 'lower_tank',
+    capacity: 200,
+    labelID: "lower_volume",
+    label: "Cisterna",
+    yc: 0,
+    xc: 0,
+    h: 0,
+    w: 0,
+    min: 0,
+    restart: 0,
+    height: 0,
+    gap: 0,
+}
+myPump = {
+    state: 0,
+    animationStage: 0,
+    canvasID: 'pump',
+    labelID: 'pump_state',
+    Tmax: 0,
+    startDelay: 0,
+    ctx: null,
+    yc: 0,
+    xc: 0,
+    h: 0,
+    w: 0,
+}
+pir0 = {
+    state: 0,
+    canvasID: 'movement',
+    labelID: 'movement_state',
+    ctx: null,
+    yc: 0,
+    xc: 0,
+    h: 0,
+    w: 0,
+    has_luminosity: true,
+    luminosity: 30
+}
+light0 = {
+    state: 0,
+    canvasID: 'light',
+    labelID: 'light_state',
+    ctx: null,
+    yc: 0,
+    xc: 0,
+    h: 0,
+    w: 0,
+}
+myDoor = {
+    state: 0,
+    canvasID: 'door',
+    labelID: 'door_state',
+    ctx: null,
+    yc: 0,
+    xc: 0,
+    h: 0,
+    w: 0,
+}

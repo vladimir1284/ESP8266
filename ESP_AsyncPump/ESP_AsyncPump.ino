@@ -2,21 +2,32 @@
 #include "ota_setup.h"
 #include "ws_setup.h"
 #include "server_setup.h"
-#include <ModbusMaster485.h>
+#include "ModbusHandler.h"
+#include "ModbusSlave.h"
 
-#define REQUEST_DELAY 2000
-
-unsigned int lastRequest;
 int val = 0;
 
-const int EnTxPin = 5;          // HIGH:TX y LOW:RX
-SoftwareSerial mySerial(4, 14); // RX, TX
+// Creating slaves
+SoftwareSerial mySerial(RxPin, TxPin); // RX, TX
 ModbusMaster485 node(1, EnTxPin, &mySerial);
+ModbusSlave mbSlave1 = ModbusSlave(&node);
+
+// Creating the ModbusHandler
+ModbusHandler mbHandler = ModbusHandler();
+
+// Create modules
+PumpControlModule pump = PumpControlModule();
+LightControlModule light0 = LightControlModule();
+
 
 void setup()
 {
-  Serial.begin(115200);
-  Serial.setDebugOutput(true);
+  if (DEBUG)
+  {
+    Serial.begin(115200);
+    Serial.setDebugOutput(true);
+  }
+
   WiFi.mode(WIFI_AP);
   WiFi.softAP(hostName);
 
@@ -28,40 +39,25 @@ void setup()
 
   ws.onEvent(onWsEvent);
   server.addHandler(&ws);
+  // Append modules
+  pump.init("PumpCtrl0", &mbSlave1, ADR_UT_HEIGTH, ADR_UT_LEVEL);
+  mp.appendModule(&pump);
+
+  light0.init("Light0", &mbSlave1, ADR_LIGHT_MODE_0, ADR_LUMINOSITY_0);
+  mp.appendModule(&light0);
 
   server.addHandler(&events);
 
   setupServer();
 
   // Modbus
-  node.begin(19200);
-  lastRequest = 0;
+  mbSlave1.init(ADR_UT_HEIGTH, 18, ADR_UT_LEVEL, 7, MB_SPEED);
+  mbHandler.append(&mbSlave1);
 }
 
 void loop()
 {
   ArduinoOTA.handle();
   ws.cleanupClients();
-
-  if (millis() - lastRequest > REQUEST_DELAY)
-  {
-    uint8_t j, result;
-    lastRequest = millis();
-    // slave: read (11) 16-bit registers starting at register 0 to RX buffer
-    result = node.readHoldingRegisters(0, 11);
-
-    // do something with data if read is successful
-    if (result == node.ku8MBSuccess)
-    {
-      for (j = 0; j < 11; j++)
-      {
-        Serial.print(node.getResponseBuffer(j));
-        mp.mbPumpData[j] = node.getResponseBuffer(j);
-        Serial.print(",");
-      }
-        Serial.println();
-    } else {
-      Serial.println("Modbus Error!");
-    }
-  }
+  mbHandler.run();
 }

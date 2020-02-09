@@ -1,81 +1,5 @@
 function ge(s) { return document.getElementById(s); }
 
-uTank = {
-    min_level: 40,
-    canvasID: 'upper_tank',
-    capacity: 550,
-    labelID: "upper_volume",
-    label: "Tanque Elevado",
-    yc: 0,
-    xc: 0,
-    h: 0,
-    w: 0,
-    min: 0,
-    restart: 0,
-    height: 0,
-    gap: 0,
-}
-lTank = {
-    min_level: 25,
-    canvasID: 'lower_tank',
-    capacity: 200,
-    labelID: "lower_volume",
-    label: "Cisterna",
-    yc: 0,
-    xc: 0,
-    h: 0,
-    w: 0,
-    min: 0,
-    restart: 0,
-    height: 0,
-    gap: 0,
-}
-myPump = {
-    state: 0,
-    animationStage: 0,
-    canvasID: 'pump',
-    labelID: 'pump_state',
-    Tmax: 0,
-    startDelay: 0,
-    ctx: null,
-    yc: 0,
-    xc: 0,
-    h: 0,
-    w: 0,
-}
-mvSensor = {
-    state: 0,
-    canvasID: 'movement',
-    labelID: 'movement_state',
-    ctx: null,
-    yc: 0,
-    xc: 0,
-    h: 0,
-    w: 0,
-    has_luminosity: true,
-    luminosity: 30
-}
-myLight = {
-    state: 0,
-    canvasID: 'light',
-    labelID: 'light_state',
-    ctx: null,
-    yc: 0,
-    xc: 0,
-    h: 0,
-    w: 0,
-}
-myDoor = {
-    state: 0,
-    canvasID: 'door',
-    labelID: 'door_state',
-    ctx: null,
-    yc: 0,
-    xc: 0,
-    h: 0,
-    w: 0,
-}
-
 function drawUpperTankTemplate(tank) {
     let canvas = ge(tank.canvasID);
     if (canvas.getContext) {
@@ -688,12 +612,12 @@ function initPage() {
 
 function getSetups() {
     ws.send(JSON.stringify({ cmd: 'get', slave: 1, type: 'setup' }))
-    setTimeout(updateValues, 2000)
+    //setTimeout(updateValues, 2000)
 }
 
 function updateValues() {
     ws.send(JSON.stringify({ cmd: 'get', slave: 1, type: 'variables' }))
-    setTimeout(updateValues, 2000)
+    //setTimeout(updateValues, 2000)
 }
 
 
@@ -703,8 +627,8 @@ function resetIndicators() {
     drawLowerTankTemplate(lTank)
     drawUpperTankTemplate(uTank)
     drawPumpTemplate(myPump)
-    drawMovementTemplate(mvSensor)
-    drawLightTemplate(myLight)
+    drawMovementTemplate(pir0)
+    drawLightTemplate(light0)
     drawDoorTemplate(myDoor)
     animatePump()
 }
@@ -736,6 +660,11 @@ function menu_lowerTank() {
 function menu_pump() {
     ge("menu_pump").style.display = "block";
 }
+// Menu Door
+function menu_door() {
+    //ge("door_menu").style.display = "block";
+}
+
 window.onresize = resetIndicators;
 var ws = null;
 
@@ -776,17 +705,17 @@ function processMsg(data) {
     response = JSON.parse(data)
     if (response["type"] == "setup") {
         configTank(uTank,
-            response["UT_MIN"],
+            40,
             500,
-            25,
+            response["UT_MIN"],
             response["UT_RESTART"],
             response["UT_GAP"],
             response["UT_HEIGTH"]
         )
         configTank(lTank,
-            response["LT_MIN"],
-            200,
             25,
+            200,
+            response["LT_MIN"],
             response["LT_RESTART"],
             response["LT_GAP"],
             response["LT_HEIGTH"]

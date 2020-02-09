@@ -2,8 +2,16 @@
 
 MsgProcessor::MsgProcessor()
 {
+    modules_count = 0;
 }
 
+// ---------------------------------------------------------------------------
+void MsgProcessor::appendModule(Module *module)
+{
+    modules[modules_count++] = module;
+}
+
+// ---------------------------------------------------------------------------
 void MsgProcessor::processWsMessage(String msg, AsyncWebSocketClient *client)
 {
     currentClient = client;
@@ -34,10 +42,23 @@ void MsgProcessor::processWsMessage(String msg, AsyncWebSocketClient *client)
     }
 }
 
+// ---------------------------------------------------------------------------
 void MsgProcessor::handleSetOperation()
 {
+    StaticJsonDocument<RESPONSE_SIZE> response;
+    String buffer;
+
+    if (doc["type"] == "setup")
+    {
+        Serial.println("Setup");
+        buffer = updateSetups(doc);
+        currentClient->text(buffer);
+        Serial.println(buffer);
+        return;
+    }
 }
 
+// ---------------------------------------------------------------------------
 void MsgProcessor::handleGetOperation()
 {
     StaticJsonDocument<RESPONSE_SIZE> response;
@@ -45,41 +66,67 @@ void MsgProcessor::handleGetOperation()
 
     if (doc["type"] == "setup")
     {
-        response["UT_HEIGTH"] = mbPumpData[ADR_UT_HEIGTH];
-        response["UT_GAP"] = mbPumpData[ADR_UT_GAP];
-        response["UT_MIN"] = mbPumpData[ADR_UT_MIN];
-        response["UT_RESTART"] = mbPumpData[ADR_UT_RESTART];
-        response["LT_HEIGTH"] = mbPumpData[ADR_LT_HEIGTH];
-        response["LT_GAP"] = mbPumpData[ADR_LT_GAP];
-        response["LT_MIN"] = mbPumpData[ADR_LT_MIN];
-        response["LT_RESTART"] = mbPumpData[ADR_LT_RESTART];
-
-        response["type"] = doc["type"];
-        response["slave"] = doc["slave"];
-
-        serializeJson(response, buffer);
+        Serial.println("Setup");
+        buffer = getSetups(doc["module"]);
         currentClient->text(buffer);
-        //Serial.println(buffer);
+        Serial.println(buffer);
         return;
     }
 
     if (doc["type"] == "variables")
     {
-        response["UT_LEVEL"] = mbPumpData[ADR_UT_LEVEL];
-        response["LT_LEVEL"] = mbPumpData[ADR_LT_LEVEL];
-        response["PC_STATE"] = mbPumpData[ADR_PC_STATE];
-
-        response["type"] = doc["type"];
-        response["slave"] = doc["slave"];
-
-        serializeJson(response, buffer);
+        Serial.println("Variable");
+        buffer = getVariables(doc["module"]);
         currentClient->text(buffer);
-        //Serial.println(buffer);
-        return;
+        Serial.println(buffer);
         return;
     }
 }
 
+// ---------------------------------------------------------------------------
+String MsgProcessor::getVariables(String id)
+{
+    int i;
+    for (i = 0; i < modules_count; i++)
+    {
+        if (modules[i]->module_id.equals(id))
+        {
+            return modules[i]->getVariables();
+        }
+    }
+    return "No se encuentra el modulo " + id + "!";
+}
+
+// ---------------------------------------------------------------------------
+String MsgProcessor::getSetups(String id)
+{
+    int i;
+    for (i = 0; i < modules_count; i++)
+    {
+        if (modules[i]->module_id.equals(id))
+        {
+            return modules[i]->getConfigs();
+        }
+    }
+    return "No se encuentra el modulo " + id + "!";
+}
+
+// ---------------------------------------------------------------------------
+String MsgProcessor::updateSetups(StaticJsonDocument<512> rq_doc)
+{
+    int i;
+    const char* id = rq_doc["module"];
+    for (i = 0; i < modules_count; i++)
+    {
+        if (modules[i]->module_id.equals(id))
+        {
+            return modules[i]->setConfigs(rq_doc);
+        }
+    }
+    return "No se encuentra el modulo " + String(id) + "!";
+}
+
+// ---------------------------------------------------------------------------
 String MsgProcessor::fixFileName(String str)
 {
     const char *txt = doc[str];
@@ -91,6 +138,7 @@ String MsgProcessor::fixFileName(String str)
     return filename;
 }
 
+// ---------------------------------------------------------------------------
 void MsgProcessor::handleFileOperation()
 {
     String response = "";
