@@ -15,7 +15,7 @@ ringOn  = 3
 
 # Digital Outputs
 buzzer = 2
-dOuts = DigitalOutputs595(2,0,3)
+dOuts = DigitalOutputs595(2,0,13,3)
 
 # Sensor
 so = Pin(12, Pin.IN)
@@ -32,7 +32,10 @@ display=Display()
 def get_temp(req, resp):
     values = {"temperature": controller.temperature,
               "regulator": controller.pidParams.output,
-              "error":(controller.pidParams.setpoint-controller.pidParams.input)}
+              "error":(controller.pidParams.setpoint-controller.pidParams.input),
+              "inAuto":controller.pid.inAuto,
+              "lowerPower":controller.lowerResistor,
+              "upperPower":controller.upperResistor}
     yield from picoweb.jsonify(resp, values)
 
 def set_auto(req, resp):    
