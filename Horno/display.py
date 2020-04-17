@@ -48,16 +48,19 @@ class Display:
     self.oled.show()
 
   def updateTimer(self, delay):
-    self.lastTime = delay
-    # Time in minutes to HH:MM
-    HH = delay/60
-    MM = delay%60
-    # Update number
-    x0 = 50
-    self.oled.framebuf.fill_rect(x0,24,27,8,0)
-    self.oled.text("%1i" % HH,x0,24)
-    self.oled.text("%02i" % MM,x0+11,24)    
-    self.alternateDots()
+    delay = int(delay)
+    if (delay != self.lastTime):
+      self.lastTime = delay
+      # Time in minutes to HH:MM
+      HH = delay/60
+      MM = delay%60
+      # Update number
+      x0 = 50
+      self.oled.framebuf.fill_rect(x0,24,27,8,0)
+      self.oled.text("%1i" % HH,x0,24)
+      self.oled.text("%02i" % MM,x0+11,24)  
+    if (delay != 0):  
+      self.alternateDots()
 
   def alternateDots(self):
     x0 = 50

@@ -37,15 +37,22 @@ class Horno:
     self.tempsHead = 0                    # Pointer to the head of the sliding window
     self.temperature = 30.0               # Average temperature
     self.lastRead = 0
+    self.t = 0
     
     # Status
     self.on = False
+    self.ready = False
     self.turnOFF()
     
     
   def run(self):
     if (self.on):
       now = utime.ticks_ms()
+      
+      # Verify ready
+      if (self.pid.inAuto):
+        if (self.temperature > self.pidParams.setpoint):
+          self.ready = True
       
       # Handle resistors
       timeChange = utime.ticks_diff(now, self.lastPWM)
@@ -78,7 +85,7 @@ class Horno:
     self.segmentPWM = (self.segmentPWM + 1) % 100
     
   def _pwm(self, level, R):
-    if (self.segmentPWM <= level):
+    if (self.segmentPWM < level):
       if (not(self.dOuts.getValue(R))):
         self.dOuts.digitalWrite(R, 1)
     else:
@@ -87,21 +94,23 @@ class Horno:
     
   # Running average filter for temperature readings  
   def tempFilter(self):
-    t = self.sensor.read()
+    self.t = self.sensor.read()
     self.temperature -= self.temps[self.tempsHead] / self.windowSize
-    self.temperature += t / self.windowSize
-    self.temps[self.tempsHead] = t
+    self.temperature += self.t / self.windowSize
+    self.temps[self.tempsHead] = self.t
     self.tempsHead = (self.tempsHead + 1) % self.windowSize
   
   # Start the oven at the desired temperature in automatic mode  
   def setAuto(self, setPoint):
     self.on = True
+    self.ready = False
     self.pidParams.setpoint = setPoint
     self.pid.setMode(PID.AUTOMATIC)
   
   # Start the oven at the desired temperature in automatic mode  
   def setManual(self, upperResistor, lowerResistor):
     self.on = True
+    self.ready = False
     self.pid.setMode(PID.MANUAL)
     self.lowerResistor = lowerResistor
     self.upperResistor = upperResistor    
@@ -111,4 +120,7 @@ class Horno:
     self.pid.setMode(PID.MANUAL)
     self.lowerResistor = 0
     self.upperResistor = 0
+    self.dOuts.digitalWrite(self.lowerR, 0)
+    self.dOuts.digitalWrite(self.upperR, 0)
     self.on = False
+    self.ready = False
