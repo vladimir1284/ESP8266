@@ -3,30 +3,32 @@ import sys
 import requests
 
 INTERVAL = 10
-url="http://192.168.4.1/get_temp"
+url="http://192.168.4.1/get_values"
 
 def main(argv):
   fname= argv[0]
      
   f=open(fname,"w")
-  f.write("Hora,Temperatura\n")
+  f.write("datetime,temperature,regulator,error,inAuto,ready,lowerPower,upperPower\n")
 
   while(1):
-    temp = 0
-    for _ in range(INTERVAL):
-      r = requests.get(url = url)
-      temp += r.json()
-      time.sleep(1)
-      
-    temp = temp/INTERVAL
-
+    r = requests.get(url = url)
+    data = r.json()
 
     t = time.localtime()
     current_time = time.strftime("%H:%M:%S", t)
 
-    registerStr = "%s,%.2f\n" % (current_time, temp)
+    registerStr = "%s,%.2f,%.2f,%.2f,%i,%i,%i,%i\n" % (current_time, 
+                                                       data["temperature"], 
+                                                       data["regulator"], 
+                                                       data["error"], 
+                                                       data["inAuto"], 
+                                                       data["ready"], 
+                                                       data["lowerPower"], 
+                                                       data["upperPower"])
     print(registerStr)
     f.write(registerStr)
+    time.sleep(INTERVAL)
 
 
 if __name__ == "__main__":

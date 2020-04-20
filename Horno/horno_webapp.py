@@ -49,7 +49,7 @@ def get_values(req, resp):
     values["error"] = controller.pidParams.setpoint-controller.pidParams.input
     values["inAuto"] = controller.pid.inAuto
     values["timer"] = timerFinish - utime.ticks_ms()
-    values["ready"] = controller.ready
+    #values["ready"] = controller.ready
     values["on"] = controller.on
     values["lowerPower"] = controller.lowerResistor
     values["upperPower"] = controller.upperResistor
@@ -99,7 +99,7 @@ async def updateDisplay():
     global ringOn, timerFinish
     while(1):
         # Check for ready state
-        if (values["ready"] =! controller.ready):
+        if (values["ready"] != controller.ready):
             values["ready"] = controller.ready
             if (values["ready"]):
                 # Two bips for the user

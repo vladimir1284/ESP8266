@@ -1,22 +1,17 @@
-#                            0.003843
-# -------------------------------------------------------------
-# z^5 - 1.676 z^4 + 0.6212 z^3 + 0.1002 z^2 - 0.1793 z + 0.1346
-
-# dt = 10
-
 from pylab import *
 
 class Model:
   def __init__(self):
-    self.Xi = [0,0,0,0,0]
+    self.Xi = 0*ones(71)
     self.Yi = [0,0,0,0,0]
     
   def evaluate(self, x):
-    y = (0.00384319*self.Xi[4]+1.67563003*self.Yi[0]-0.62123333*self.Yi[1]
-        -0.10019785*self.Yi[2]+0.17927016*self.Yi[3] - 0.13463214*self.Yi[4])
+    y = (0.01824*self.Xi[70]+ 0.3369*self.Yi[0] + 0.2516*self.Yi[1]
+        + 0.092795*self.Yi[2] + 0.1174*self.Yi[3] + 0.1927*self.Yi[4])
     for i in range(4, 0, -1):
-      self.Xi[i] = self.Xi[i - 1]
       self.Yi[i] = self.Yi[i - 1]
+    for i in range(70, 0, -1):      
+      self.Xi[i] = self.Xi[i - 1]
     self.Xi[0] = x
     self.Yi[0] = y
     return y
@@ -25,14 +20,14 @@ def main():
   # Check step response
   
   # Load data from file
-  f = file("ident_edited.csv","r")
+  f = file("step-30.csv","r")
   f.readline()
   temp = []
   u = []
   for line in f.readlines():
     data = line.split(",")
     temp.append(float(data[1]))
-    u.append(int(data[2]))  
+    u.append(float(data[6]))  
   f.close()
     
   minTemp = min(temp)
@@ -59,7 +54,7 @@ def main():
   title('Temepratura del horno vs tiempo')
   legend(('Temepratura','Calentador','Identificado'))
 
-  img.savefig('test_model.png')
+  img.savefig('test_model_ss.png')
   
 if __name__ == "__main__":
 	main()

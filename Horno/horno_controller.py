@@ -45,10 +45,18 @@ class Horno:
     self.turnOFF()
     
     
-  def run(self):
-    if (self.on):
-      now = utime.ticks_ms()
-      
+  def run(self):    
+    now = utime.ticks_ms()
+        
+    # Handle temperature and PID
+    timeChange = utime.ticks_diff(now, self.lastRead)
+    if (timeChange > self.Tread):
+      self.tempFilter()
+      self.pidParams.input = self.temperature  
+      self.pid.compute()
+      self.lastRead = now
+    
+    if (self.on):      
       # Verify ready
       if (self.pid.inAuto):
         if (self.temperature > self.pidParams.setpoint):
@@ -59,23 +67,11 @@ class Horno:
       if (timeChange > self.Tresist):
         self.handleResistors()
         self.lastPWM = now
-      
-      # Handle temperature and PID
-      timeChange = utime.ticks_diff(now, self.lastRead)
-      if (timeChange > self.Tread):
-        self.tempFilter()
-        self.pidParams.input = self.temperature  
-        self.pid.compute()
-        self.lastRead = now
-    
+
   def handleResistors(self):
     if (self.pid.inAuto):
-      if (self.pidParams.output > self.thress):
-        self.lowerResistor = 100
-        self.upperResistor = 1.78*(self.pidParams.output-self.thress)
-      else:
-        self.lowerResistor = 2.27*self.pidParams.output
-        self.upperResistor = 0
+      self.lowerResistor = self.pidParams.output
+      self.upperResistor = self.pidParams.output
         
     # PWM upper resistor
     self._pwm(self.upperResistor, self.upperR)
