@@ -9,6 +9,6 @@ import webrepl
 ap = network.WLAN(network.AP_IF) # create access-point interface
 ap.active(True)
 # activate the interface
-ap.config(essid='ESP-8266', authmode=network.AUTH_OPEN) # set the ESSID of the access point
+ap.config(essid='Horno', authmode=network.AUTH_OPEN) # set the ESSID of the access point
 webrepl.start()
 gc.collect()

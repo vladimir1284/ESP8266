@@ -12,6 +12,8 @@ class Horno:
   windowSize = 10    # Number of samples for the average filter
   thress     = 44    # After this output value the lower resistor 
                      # is totaly on and the upper resistor starts
+  H1         = 30    # Degrees below setpoint to enable PID
+  HoldTime   = 150000# Milliseconds after first heating to turn PID on
   
   # Constructor
   def __init__(self, sensor, dOuts):
@@ -20,7 +22,7 @@ class Horno:
     self.pid = PID(params = self.pidParams, kP = 0, kI = 0, kD = 0, 
                     direction = PID.DIRECT, debugEnabled = True)
     self.pid.sampleTime = self.Ts # ms
-    self.pid.setTunings(2.5,0.005,7)
+    self.pid.setTunings(2.5,0.005,0)
     self.pid.setOutputLimits(0, 100)
     self.pid.debugEnabled = False
     
@@ -42,6 +44,7 @@ class Horno:
     # Status
     self.on = False
     self.ready = False
+    self.starting = 0
     self.turnOFF()
     
     
@@ -70,8 +73,22 @@ class Horno:
 
   def handleResistors(self):
     if (self.pid.inAuto):
-      self.lowerResistor = self.pidParams.output
-      self.upperResistor = self.pidParams.output
+      # First Heating zone    
+      if ((self.temperature < self.pidParams.setpoint-self.H1) and (self.starting == 0)):
+          self.lowerResistor = 100
+          self.upperResistor = 100
+      else:
+          now = utime.ticks_ms()
+          if (self.starting == 0):
+            self.starting = now
+          if (now - self.starting > self.HoldTime):
+            # PID activate
+            self.lowerResistor = self.pidParams.output
+            self.upperResistor = self.pidParams.output
+          else:
+            self.lowerResistor = 0
+            self.upperResistor = 0
+            self.pid.iTerm = 0
         
     # PWM upper resistor
     self._pwm(self.upperResistor, self.upperR)
@@ -97,10 +114,11 @@ class Horno:
     self.tempsHead = (self.tempsHead + 1) % self.windowSize
   
   # Start the oven at the desired temperature in automatic mode  
-  def setAuto(self, setPoint):
+  def setAuto(self, setpoint):
     self.on = True
     self.ready = False
-    self.pidParams.setpoint = setPoint
+    self.starting = 0
+    self.pidParams.setpoint = setpoint
     self.pid.setMode(PID.AUTOMATIC)
   
   # Start the oven at the desired temperature in automatic mode  
